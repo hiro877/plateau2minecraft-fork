@@ -87,6 +87,7 @@ cd plateau2minecraft/
 poetry run python -m plateau2minecraft --target data/13100_tokyo23-ku_2022_citygml_1_2_op/udx/bldg/53393503_bldg_6697_2_op.gml --output data/output/ --print-min-z
 
 # Step2: use the printed value as base height when converting other features
+#        if omitted, `--base-z` defaults to 0
 poetry run python -m plateau2minecraft --target <non_building_gml> --output data/output/ --base-z <height>
 ```
 

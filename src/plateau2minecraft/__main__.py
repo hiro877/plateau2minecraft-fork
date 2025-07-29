@@ -28,8 +28,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--base-z",
         type=float,
-        default=None,
-        help="align all objects so that their lowest Z matches the specified height",
+        default=0.0,
+        help="align all objects so that their lowest Z matches the specified height (default: 0)",
     )
     parser.add_argument(
         "--print-min-z",
@@ -50,10 +50,9 @@ if __name__ == "__main__":
         point_cloud = voxelize(triangle_mesh)
         point_cloud = assign(point_cloud, feature_type)
 
-        if args.base_z is not None:
-            current_min_z = point_cloud.vertices[:, 2].min()
-            offset = args.base_z - current_min_z
-            point_cloud.vertices[:, 2] += offset
+        current_min_z = point_cloud.vertices[:, 2].min()
+        offset = args.base_z - current_min_z
+        point_cloud.vertices[:, 2] += offset
 
         point_cloud_list.append(point_cloud)
         logging.info(f"Processing end: {file_path}")
@@ -67,4 +66,3 @@ if __name__ == "__main__":
 
     logging.info(f"To : {args.target}")
     region = Minecraft(merged).build_region(args.output)
-
