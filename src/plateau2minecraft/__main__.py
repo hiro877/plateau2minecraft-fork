@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 from plateau2minecraft.converter import Minecraft
+from plateau2minecraft.height_utils import align_base_height
 from plateau2minecraft.impart_color import assign
 from plateau2minecraft.merge_points import merge
 from plateau2minecraft.parser import get_triangle_meshs
@@ -25,6 +26,11 @@ if __name__ == "__main__":
         help="the output result encompasses the specified CityGML range",
     )
     parser.add_argument("--output", required=True, type=Path, help="output folder")
+    parser.add_argument(
+        "--align-height",
+        action="store_true",
+        help="shift buildings so their lowest point starts at height 0",
+    )
     args = parser.parse_args()
 
     point_cloud_list = []
@@ -34,6 +40,8 @@ if __name__ == "__main__":
 
         logging.info(f"Triangulation: {file_path}")
         triangle_mesh = get_triangle_meshs(file_path, feature_type)
+        if args.align_height and feature_type == "bldg":
+            triangle_mesh = align_base_height(triangle_mesh)
 
         logging.info(f"Voxelize: {file_path}")
         point_cloud = voxelize(triangle_mesh)

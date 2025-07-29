@@ -34,6 +34,7 @@
 - 複数のファイルを入力すると、複数まとめて変換されますが、コンピュータのリソースを大きく消費する、膨大な時間がかかるなどのデメリットもあります
 - 建物以外にも交通・橋梁・都市設備・植生のデータを統合して変換可能ですが、PLATEAU仕様により標高が合わず、段差が出来るデータもあります
   - 例: 交通は2次元データ（つまり標高が0m）だが、建物は標高を持った3次元データのため、底面の高さが異なる
+  - `--align-height` を使用すると、建物の底面を道路の高さに合わせることができます
 
 ## システム要件
 
@@ -85,6 +86,7 @@ cd plateau2minecraft/
 ```bash
 poetry run python -m plateau2minecraft --target data/13100_tokyo23-ku_2022_citygml_1_2_op/udx/bldg/53393503_bldg_6697_2_op.gml --output data/output/
 ```
+`--align-height` オプションを付与すると、建物の最下部が標高 0m になるように平行移動します。
 
 - 生成された `plateau2minecraft/data/output/world_data/region/`以下の.mcaファイルをMinecraftフォルダ内の `minecraft/saves/<your_world_name>/region/`フォルダ内に格納する
 - Minecraft上で当該ワールドを開く
