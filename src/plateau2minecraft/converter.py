@@ -18,33 +18,19 @@ class Minecraft:
         return points
 
     def _split_point_cloud(self, vertices: np.ndarray, block_size: int = 512) -> dict[str, np.ndarray]:
-        # XYZ座標の取得
-        x = vertices[:, 0]
-        y = vertices[:, 1]
+        block_coords = np.floor_divide(vertices[:, :2], block_size).astype(int)
+        unique, inverse = np.unique(block_coords, axis=0, return_inverse=True)
 
-        # XY座標をブロックサイズで割って、整数値に丸めることでブロックIDを作成
-        block_id_x = np.floor(x / block_size).astype(int)
-        block_id_y = np.floor(y / block_size).astype(int)
-
-        # ブロックIDを一意の文字列として結合
-        block_ids = [f"r.{id_x}.{id_y}.mca" for id_x, id_y in zip(block_id_x, block_id_y)]
-
-        # 各ブロックIDとそのブロックに含まれる座標を格納する辞書を作成
         blocks = {}
-        for i, block_id in enumerate(block_ids):
-            if block_id not in blocks:
-                blocks[block_id] = []
-            blocks[block_id].append(vertices[i])
+        for idx, (bx, by) in enumerate(unique):
+            mask = inverse == idx
+            block_id = f"r.{bx}.{by}.mca"
+            blocks[block_id] = vertices[mask]
 
-        # ブロックIDと座標を含む辞書を返す
         return blocks
 
     def _standardize_vertices(self, blocks: dict[str, np.ndarray], block_size: int = 512):
-        standardized_blocks = {}
-        for block_id, vertices in blocks.items():
-            standardized_vertices = [vertex % block_size for vertex in vertices]
-            standardized_blocks[block_id] = standardized_vertices
-        return standardized_blocks
+        return {block_id: np.mod(vertices, block_size) for block_id, vertices in blocks.items()}
 
     def build_region(self, output: Path, origin: tuple[float, float, float] | None = None) -> None:
         points = np.asarray(self.point_cloud.vertices)
