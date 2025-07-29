@@ -83,7 +83,11 @@ cd plateau2minecraft/
 - CityGMLと出力先フォルダを指定して変換
 
 ```bash
-poetry run python -m plateau2minecraft --target data/13100_tokyo23-ku_2022_citygml_1_2_op/udx/bldg/53393503_bldg_6697_2_op.gml --output data/output/
+# Step1: convert building data and print its minimum height
+poetry run python -m plateau2minecraft --target data/13100_tokyo23-ku_2022_citygml_1_2_op/udx/bldg/53393503_bldg_6697_2_op.gml --output data/output/ --print-min-z
+
+# Step2: use the printed value as base height when converting other features
+poetry run python -m plateau2minecraft --target <non_building_gml> --output data/output/ --base-z <height>
 ```
 
 - 生成された `plateau2minecraft/data/output/world_data/region/`以下の.mcaファイルをMinecraftフォルダ内の `minecraft/saves/<your_world_name>/region/`フォルダ内に格納する

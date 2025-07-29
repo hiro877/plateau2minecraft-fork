@@ -25,6 +25,17 @@ if __name__ == "__main__":
         help="the output result encompasses the specified CityGML range",
     )
     parser.add_argument("--output", required=True, type=Path, help="output folder")
+    parser.add_argument(
+        "--base-z",
+        type=float,
+        default=None,
+        help="align all objects so that their lowest Z matches the specified height",
+    )
+    parser.add_argument(
+        "--print-min-z",
+        action="store_true",
+        help="print the minimum Z of the processed data",
+    )
     args = parser.parse_args()
 
     point_cloud_list = []
@@ -39,11 +50,21 @@ if __name__ == "__main__":
         point_cloud = voxelize(triangle_mesh)
         point_cloud = assign(point_cloud, feature_type)
 
+        if args.base_z is not None:
+            current_min_z = point_cloud.vertices[:, 2].min()
+            offset = args.base_z - current_min_z
+            point_cloud.vertices[:, 2] += offset
+
         point_cloud_list.append(point_cloud)
         logging.info(f"Processing end: {file_path}")
 
     logging.info(f"Merging: {args.target}")
     merged = merge(point_cloud_list)
 
+    if args.print_min_z:
+        min_z = merged.vertices[:, 2].min()
+        print(f"minimum_z: {min_z}")
+
     logging.info(f"To : {args.target}")
     region = Minecraft(merged).build_region(args.output)
+
