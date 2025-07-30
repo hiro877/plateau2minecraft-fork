@@ -11,8 +11,8 @@ from plateau2minecraft.voxelizer import voxelize
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
-def _extract_feature_type(file_path: str) -> str:
-    return file_path.split("/")[-1].split("_")[1]
+def _extract_feature_type(file_path: Path) -> str:
+    return file_path.stem.split("_")[1]
 
 
 if __name__ == "__main__":
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     point_cloud_list = []
     for file_path in args.target:
         logging.info(f"Processing start: {file_path}")
-        feature_type = _extract_feature_type(str(file_path))
+        feature_type = _extract_feature_type(file_path)
 
         logging.info(f"Triangulation: {file_path}")
         triangle_mesh = get_triangle_meshs(file_path, feature_type)
