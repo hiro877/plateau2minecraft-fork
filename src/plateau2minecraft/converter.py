@@ -1,8 +1,6 @@
-import os
 from pathlib import Path
 
 import numpy as np
-from click import Path
 from trimesh.points import PointCloud
 
 from .anvil import Block, EmptyRegion
@@ -53,14 +51,14 @@ class Minecraft:
 
         stone = Block("minecraft", "stone")
 
-        # data/output/world_data/region/フォルダの中身を削除
-        # フォルダが存在しない場合は、フォルダを作成する
-        # フォルダが存在する場合は、フォルダの中身を削除する
-        if os.path.exists("data/output/world_data/region"):
-            for file in os.listdir("data/output/world_data/region"):
-                os.remove(f"data/output/world_data/region/{file}")
+        # Delete contents under ``output/world_data/region`` if it exists
+        # or create the directory otherwise
+        region_dir = Path(output) / "world_data" / "region"
+        if region_dir.exists():
+            for file in region_dir.iterdir():
+                file.unlink()
         else:
-            os.makedirs("data/output/world_data/region", exist_ok=True)
+            region_dir.mkdir(parents=True, exist_ok=True)
 
         for block_id, points in standardized_blocks.items():
             region = EmptyRegion(0, 0)
@@ -68,11 +66,11 @@ class Minecraft:
             for row in points:
                 x, y, z = row
                 try:
-                    region.set_block(stone, x, z, y) # MinecraftとはY-UPの右手系なので、そのように変数を定義する
+                    region.set_block(stone, x, z, y)  # MinecraftとはY-UPの右手系なので、そのように変数を定義する
                 except OutOfBoundsCoordinates:
                     continue
             print(f"save: {block_id}")
-            region.save(f"{output}/world_data/region/{block_id}")
+            region.save(str(region_dir / block_id))
 
     def _get_world_origin(self, vertices):
         min_x = min(vertices[:, 0])
